@@ -1,45 +1,107 @@
-# 🎨 AI Photo Studio for UMKM (BYOK Version)
+# 🎨 AI Foto Estetik BYOK
 
-**Bring Your Own API Key** - Generate professional AI photos using your own Google Gemini API key!
+**Bring Your Own API Key** - Studio Foto AI Lengkap dengan Authentication untuk UMKM Indonesia!
 
 ## ✨ Features
 
+### 🔐 Authentication & Security
+- ✅ **User Authentication** - Secure login with email verification (Supabase)
+- ✅ **Email Verification Required** - Only verified users can access the app
+- ✅ **Protected Routes** - All features behind authentication wall
+- ✅ **User Profile** - Display user info with logout functionality
+
+### 📸 6 Fitur Foto AI Lengkap
+- ✅ **Photoshoot Produk** - 6 preset background profesional untuk foto produk
+- ✅ **Foto Model AI** - Buat model baru atau ubah pose dengan 5 style
+- ✅ **Gabungkan Gambar** - Kombinasi 2 gambar jadi 1
+- ✅ **Edit Foto** - Enhance & fix foto (quality, color, lighting, dll)
+- ✅ **Generate Prompt** - AI analisis foto jadi prompt (3 style)
+- ✅ **Banner Iklan** - Buat banner iklan dengan 5 size & 5 style
+
+### 🚀 Technical Features
 - ✅ **No Backend Required** - Pure frontend application
-- ✅ **Use Your Own API Key** - No subscription, no credits, just your Gemini API
+- ✅ **Use Your Own API Key** - No subscription, just your Gemini API
 - ✅ **100% Local Storage** - API keys stored locally, never sent to any server
-- ✅ **Fast & Simple** - Clean, minimal UI inspired by Gemini Canvas
 - ✅ **Multiple Images** - Generate 1-4 images per request
 - ✅ **Download All** - Easy batch download
 - ✅ **Usage Statistics** - Track your generations locally
 
 ## 🚀 Quick Start
 
-### 1. Install Dependencies
+### 1. Setup Supabase (Authentication)
+
+1. **Create Supabase Project**
+   - Visit [Supabase Dashboard](https://supabase.com/dashboard)
+   - Click "New Project"
+   - Fill in project details
+
+2. **Enable Email Authentication**
+   - Go to Authentication > Providers
+   - Enable "Email" provider
+   - ✅ Enable "Confirm email"
+
+3. **Get Your Supabase Credentials**
+   - Go to Project Settings > API
+   - Copy `Project URL` and `anon/public` key
+
+4. **Create Environment File**
+   ```bash
+   cp .env.example .env
+   ```
+
+5. **Fill in `.env` file**
+   ```
+   VITE_SUPABASE_URL=https://your-project.supabase.co
+   VITE_SUPABASE_ANON_KEY=your-anon-key-here
+   ```
+
+### 2. Install Dependencies
 
 ```bash
 npm install
 ```
 
-### 2. Run Development Server
+### 3. Run Development Server
 
 ```bash
 npm run dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000)
+Open [http://localhost:5173](http://localhost:5173)
 
-### 3. Get Your API Key
+### 4. Register & Login
+
+1. Click "Daftar di sini"
+2. Enter email & password (min 6 characters)
+3. Check your email for verification link
+4. Click verification link
+5. Return to app and click "Saya Sudah Verifikasi Email"
+
+### 5. Get Your Gemini API Key
 
 1. Visit [Google AI Studio](https://aistudio.google.com/app/apikey)
 2. Create a new API key
-3. Paste it in the app
+3. Paste it in the app and validate
 
-### 4. Start Generating!
+### 6. Start Generating!
 
-1. Upload an image
-2. Write a prompt
-3. Select number of images (1-4)
-4. Click Generate!
+1. Choose a feature from the menu
+2. Upload an image (if required)
+3. Write a prompt or configure settings
+4. Select number of images (1-4)
+5. Click Generate!
+
+## 🔐 Authentication Flow
+
+```
+User → Register → Email Sent → Verify Email → Login → Access App
+```
+
+**Important:**
+- Email verification is **REQUIRED**
+- Unverified users will see verification page
+- All app features are protected behind authentication
+- User can logout anytime from profile dropdown
 
 ## 📦 Build for Production
 
@@ -90,11 +152,11 @@ vercel --prod
 
 ## 🛠️ Tech Stack
 
-- React 18
-- TypeScript
-- Vite
-- Tailwind CSS
-- Google Gemini API
+- **Frontend:** React 18 + TypeScript + Vite
+- **Styling:** Tailwind CSS
+- **Authentication:** Supabase Auth
+- **AI API:** Google Gemini 2.5 Flash Image
+- **Storage:** LocalStorage (API keys & usage stats)
 
 ## 📝 How It Works
 
@@ -108,10 +170,12 @@ vercel --prod
 
 ## 🔒 Security
 
-- API keys are encrypted (simple obfuscation) in localStorage
-- Keys never leave the browser
-- No telemetry or tracking
-- All processing is client-side
+- **Authentication:** Email verification required via Supabase
+- **Protected Routes:** All features behind authentication wall
+- **API Keys:** Encrypted (simple obfuscation) in localStorage
+- **Privacy:** Keys never leave the browser, no telemetry
+- **Client-Side:** All processing is client-side
+- **No Backend:** No server to hack or maintain
 
 ## 📊 API Cost Estimation
 

@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import ApiKeyManager from './components/ApiKeyManager';
 import UsageStats from './components/UsageStats';
+import UserProfile from './components/UserProfile';
 import ProductPhotoshoot from './components/ProductPhotoshoot';
 import AIModelPhoto from './components/AIModelPhoto';
 import CombineImages from './components/CombineImages';
@@ -76,21 +77,26 @@ function App() {
   return (
     <div className="min-h-screen py-8 px-4">
       <div className="max-w-7xl mx-auto">
-        {/* Header */}
-        <div className="text-center mb-8">
-          <div className="flex items-center justify-center gap-3 mb-2">
-            <div className="w-12 h-12 bg-gradient-to-br from-indigo-600 to-purple-600 rounded-xl flex items-center justify-center">
-              <svg className="w-7 h-7 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
-              </svg>
+        {/* Header with User Profile */}
+        <div className="mb-8">
+          <div className="flex items-center justify-between mb-4">
+            <div className="flex items-center gap-3">
+              <div className="w-12 h-12 bg-gradient-to-br from-indigo-600 to-purple-600 rounded-xl flex items-center justify-center">
+                <svg className="w-7 h-7 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                </svg>
+              </div>
+              <div className="text-left">
+                <h1 className="text-3xl font-bold bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent">
+                  AI Foto Estetik BYOK
+                </h1>
+                <p className="text-sm text-gray-600 hidden md:block">
+                  Studio Foto AI Lengkap untuk UMKM
+                </p>
+              </div>
             </div>
-            <h1 className="text-4xl font-bold bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent">
-              AI Foto Estetik BYOK
-            </h1>
+            <UserProfile />
           </div>
-          <p className="text-gray-600">
-            Studio Foto AI Lengkap untuk UMKM • Gunakan API Key Gemini Sendiri • Gratis • Tanpa Backend
-          </p>
         </div>
 
         {/* Top Section - API Key & Stats */}
