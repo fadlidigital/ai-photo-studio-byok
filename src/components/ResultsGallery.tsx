@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import { downloadImage, downloadAllImages } from '../utils/download';
 
 interface ResultsGalleryProps {
@@ -7,6 +8,8 @@ interface ResultsGalleryProps {
 }
 
 export default function ResultsGallery({ images, isLoading, imageCount }: ResultsGalleryProps) {
+  const [previewImage, setPreviewImage] = useState<string | null>(null);
+
   if (isLoading) {
     return (
       <div className="grid grid-cols-2 gap-4">
@@ -40,64 +43,117 @@ export default function ResultsGallery({ images, isLoading, imageCount }: Result
   }
 
   return (
-    <div className="space-y-4">
-      {/* Download All Button */}
-      <div className="flex justify-end">
-        <button
-          onClick={() => downloadAllImages(images)}
-          className="flex items-center gap-2 px-4 py-2 bg-indigo-600 text-white font-semibold rounded-lg hover:bg-indigo-700 transition-colors"
-        >
-          <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
-          </svg>
-          Download All ({images.length})
-        </button>
-      </div>
-
-      {/* Image Grid */}
-      <div className="grid grid-cols-2 gap-4">
-        {images.map((image, index) => (
-          <div
-            key={index}
-            className="relative group aspect-square bg-white rounded-lg border-2 border-gray-200 overflow-hidden shadow-md hover:shadow-xl transition-shadow"
+    <>
+      <div className="space-y-4">
+        {/* Download All Button */}
+        <div className="flex justify-end">
+          <button
+            onClick={() => downloadAllImages(images)}
+            className="flex items-center gap-2 px-4 py-2 bg-indigo-600 text-white font-semibold rounded-lg hover:bg-indigo-700 transition-colors"
           >
-            <img
-              src={image}
-              alt={`Generated ${index + 1}`}
-              className="w-full h-full object-contain"
-            />
+            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+            </svg>
+            Download All ({images.length})
+          </button>
+        </div>
 
-            {/* Hover Overlay */}
-            <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-2">
-              <button
-                onClick={() => window.open(image, '_blank')}
-                className="p-3 bg-white rounded-full hover:bg-gray-100 transition-colors"
-                title="View Full Size"
-              >
-                <svg className="w-5 h-5 text-gray-800" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
-                </svg>
-              </button>
+        {/* Image Grid */}
+        <div className="grid grid-cols-2 gap-4">
+          {images.map((image, index) => (
+            <div
+              key={index}
+              className="relative group aspect-square bg-white rounded-lg border-2 border-gray-200 overflow-hidden shadow-md hover:shadow-xl transition-shadow"
+            >
+              <img
+                src={image}
+                alt={`Generated ${index + 1}`}
+                className="w-full h-full object-contain"
+              />
 
-              <button
-                onClick={() => downloadImage(image, `ai-photo-${Date.now()}-${index + 1}.png`)}
-                className="p-3 bg-white rounded-full hover:bg-gray-100 transition-colors"
-                title="Download"
-              >
-                <svg className="w-5 h-5 text-gray-800" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
-                </svg>
-              </button>
+              {/* Hover Overlay */}
+              <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-2">
+                <button
+                  onClick={() => setPreviewImage(image)}
+                  className="p-3 bg-white rounded-full hover:bg-gray-100 transition-colors"
+                  title="View Full Size"
+                >
+                  <svg className="w-5 h-5 text-gray-800" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                  </svg>
+                </button>
+
+                <button
+                  onClick={() => downloadImage(image, `ai-photo-${Date.now()}-${index + 1}.png`)}
+                  className="p-3 bg-white rounded-full hover:bg-gray-100 transition-colors"
+                  title="Download"
+                >
+                  <svg className="w-5 h-5 text-gray-800" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+                  </svg>
+                </button>
+              </div>
+
+              {/* Image Number Badge */}
+              <div className="absolute top-2 left-2 px-2 py-1 bg-black/70 text-white text-xs font-bold rounded">
+                {index + 1}
+              </div>
             </div>
-
-            {/* Image Number Badge */}
-            <div className="absolute top-2 left-2 px-2 py-1 bg-black/70 text-white text-xs font-bold rounded">
-              {index + 1}
-            </div>
-          </div>
-        ))}
+          ))}
+        </div>
       </div>
-    </div>
+
+      {/* Preview Modal */}
+      {previewImage && (
+        <div
+          className="fixed inset-0 bg-black/90 z-50 flex items-center justify-center p-4 animate-fade-in"
+          onClick={() => setPreviewImage(null)}
+        >
+          <button
+            onClick={() => setPreviewImage(null)}
+            className="absolute top-4 right-4 p-2 bg-white/10 hover:bg-white/20 rounded-full text-white transition-colors"
+            title="Close"
+          >
+            <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+            </svg>
+          </button>
+
+          <div className="max-w-7xl max-h-[90vh] w-full" onClick={(e) => e.stopPropagation()}>
+            <img
+              src={previewImage}
+              alt="Preview"
+              className="w-full h-full object-contain rounded-lg"
+            />
+          </div>
+
+          <div className="absolute bottom-4 right-4">
+            <button
+              onClick={(e) => {
+                e.stopPropagation();
+                downloadImage(previewImage, `ai-photo-${Date.now()}.png`);
+              }}
+              className="flex items-center gap-2 px-6 py-3 bg-indigo-600 hover:bg-indigo-700 text-white font-semibold rounded-lg transition-colors shadow-lg"
+            >
+              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+              </svg>
+              Download
+            </button>
+          </div>
+        </div>
+      )}
+
+      <style>{`
+        @keyframes fade-in {
+          from { opacity: 0; }
+          to { opacity: 1; }
+        }
+        .animate-fade-in {
+          animation: fade-in 0.2s ease-out;
+        }
+      `}</style>
+    </>
   );
 }
