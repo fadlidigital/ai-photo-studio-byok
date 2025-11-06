@@ -1,72 +1,77 @@
 import { useState, useEffect } from 'react';
 import ApiKeyManager from './components/ApiKeyManager';
-import ImageUploader from './components/ImageUploader';
-import ResultsGallery from './components/ResultsGallery';
 import UsageStats from './components/UsageStats';
-import { generateImages } from './services/gemini';
+import ProductPhotoshoot from './components/ProductPhotoshoot';
+import AIModelPhoto from './components/AIModelPhoto';
+import CombineImages from './components/CombineImages';
+import EditPhoto from './components/EditPhoto';
+import PromptGenerator from './components/PromptGenerator';
+import AdBannerCreator from './components/AdBannerCreator';
 import { storage } from './services/storage';
+
+type Feature = 'photoshoot' | 'model' | 'combine' | 'edit' | 'prompt' | 'banner';
+
+interface FeatureTab {
+  id: Feature;
+  name: string;
+  icon: string;
+  description: string;
+}
+
+const features: FeatureTab[] = [
+  { id: 'photoshoot', name: 'Photoshoot Produk', icon: '📸', description: 'Background profesional untuk foto produk' },
+  { id: 'model', name: 'Foto Model AI', icon: '👤', description: 'Buat model baru atau ubah pose' },
+  { id: 'combine', name: 'Gabungkan Gambar', icon: '🖼️', description: 'Kombinasi 2 gambar jadi 1' },
+  { id: 'edit', name: 'Edit Foto', icon: '✏️', description: 'Perbaiki dan enhance foto' },
+  { id: 'prompt', name: 'Buat Prompt', icon: '💡', description: 'Generate prompt dari foto' },
+  { id: 'banner', name: 'Banner Iklan', icon: '🎨', description: 'Buat banner iklan menarik' },
+];
 
 function App() {
   const [apiKey, setApiKey] = useState<string | null>(null);
-  const [uploadedImage, setUploadedImage] = useState<{ base64: string; mimeType: string; preview: string } | null>(null);
-  const [prompt, setPrompt] = useState('');
-  const [imageCount, setImageCount] = useState(4);
-  const [generatedImages, setGeneratedImages] = useState<string[]>([]);
-  const [isGenerating, setIsGenerating] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+  const [activeFeature, setActiveFeature] = useState<Feature>('photoshoot');
   const [usageStats, setUsageStats] = useState(storage.getUsageStats());
 
   useEffect(() => {
     // Load stats on mount
     setUsageStats(storage.getUsageStats());
+
+    // Update stats every time a generation completes
+    const interval = setInterval(() => {
+      setUsageStats(storage.getUsageStats());
+    }, 2000);
+
+    return () => clearInterval(interval);
   }, []);
 
-  const handleGenerate = async () => {
+  const renderFeatureContent = () => {
     if (!apiKey) {
-      setError('Please enter and validate your API key first');
-      return;
-    }
-
-    if (!uploadedImage) {
-      setError('Please upload an image first');
-      return;
-    }
-
-    if (!prompt.trim()) {
-      setError('Please enter a prompt');
-      return;
-    }
-
-    setIsGenerating(true);
-    setError(null);
-    setGeneratedImages([]);
-
-    try {
-      const results = await generateImages(
-        { apiKey },
-        {
-          imageBase64: uploadedImage.base64,
-          mimeType: uploadedImage.mimeType,
-          prompt: prompt,
-          imageCount: imageCount,
-        }
+      return (
+        <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-8 text-center">
+          <p className="text-yellow-800 text-lg">
+            ⚠️ Silakan masukkan dan validasi API Key Gemini terlebih dahulu di bagian atas
+          </p>
+        </div>
       );
+    }
 
-      setGeneratedImages(results);
-
-      // Update usage stats
-      storage.updateUsageStats(results.length);
-      setUsageStats(storage.getUsageStats());
-
-    } catch (err) {
-      console.error('Generation error:', err);
-      setError(err instanceof Error ? err.message : 'Failed to generate images. Please try again.');
-    } finally {
-      setIsGenerating(false);
+    switch (activeFeature) {
+      case 'photoshoot':
+        return <ProductPhotoshoot apiKey={apiKey} />;
+      case 'model':
+        return <AIModelPhoto apiKey={apiKey} />;
+      case 'combine':
+        return <CombineImages apiKey={apiKey} />;
+      case 'edit':
+        return <EditPhoto apiKey={apiKey} />;
+      case 'prompt':
+        return <PromptGenerator apiKey={apiKey} />;
+      case 'banner':
+        return <AdBannerCreator apiKey={apiKey} />;
+      default:
+        return null;
     }
   };
-
-  const canGenerate = apiKey && uploadedImage && prompt.trim() && !isGenerating;
 
   return (
     <div className="min-h-screen py-8 px-4">
@@ -80,11 +85,11 @@ function App() {
               </svg>
             </div>
             <h1 className="text-4xl font-bold bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent">
-              AI Photo Studio for UMKM
+              AI Foto Estetik BYOK
             </h1>
           </div>
           <p className="text-gray-600">
-            Generate professional AI photos using your own Gemini API key • Free • No Backend Required
+            Studio Foto AI Lengkap untuk UMKM • Gunakan API Key Gemini Sendiri • Gratis • Tanpa Backend
           </p>
         </div>
 
@@ -98,91 +103,39 @@ function App() {
           </div>
         </div>
 
-        {/* Main Content */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-          {/* Left Column - Input */}
-          <div className="space-y-6">
-            <div className="bg-white rounded-lg shadow-md p-6 border border-gray-200">
-              <h2 className="text-xl font-bold text-gray-900 mb-4">1. Upload Image</h2>
-              <ImageUploader onImageUpload={setUploadedImage} />
-            </div>
-
-            <div className="bg-white rounded-lg shadow-md p-6 border border-gray-200">
-              <h2 className="text-xl font-bold text-gray-900 mb-4">2. Write Your Prompt</h2>
-              <textarea
-                value={prompt}
-                onChange={(e) => setPrompt(e.target.value)}
-                placeholder="Example: Make this photo professional with studio lighting, enhance colors, remove background..."
-                className="w-full h-32 px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent resize-none"
-              />
-
-              <div className="mt-4">
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Number of Images to Generate
-                </label>
-                <div className="grid grid-cols-4 gap-2">
-                  {[1, 2, 3, 4].map((count) => (
-                    <button
-                      key={count}
-                      onClick={() => setImageCount(count)}
-                      className={`px-4 py-2 rounded-lg font-semibold transition-colors ${
-                        imageCount === count
-                          ? 'bg-indigo-600 text-white'
-                          : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-                      }`}
-                    >
-                      {count}
-                    </button>
-                  ))}
-                </div>
-              </div>
-
+        {/* Feature Navigation */}
+        <div className="bg-white rounded-lg shadow-md p-4 mb-8">
+          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3">
+            {features.map((feature) => (
               <button
-                onClick={handleGenerate}
-                disabled={!canGenerate}
-                className="w-full mt-6 py-3 px-6 bg-gradient-to-r from-indigo-600 to-purple-600 text-white font-bold rounded-lg hover:from-indigo-700 hover:to-purple-700 disabled:from-gray-400 disabled:to-gray-400 disabled:cursor-not-allowed transition-all shadow-lg text-lg"
+                key={feature.id}
+                onClick={() => setActiveFeature(feature.id)}
+                className={`p-4 rounded-lg border-2 transition-all ${
+                  activeFeature === feature.id
+                    ? 'border-indigo-600 bg-indigo-50 shadow-md'
+                    : 'border-gray-200 bg-white hover:border-indigo-300 hover:bg-indigo-50/50'
+                }`}
               >
-                {isGenerating ? (
-                  <span className="flex items-center justify-center gap-2">
-                    <svg className="animate-spin h-5 w-5" fill="none" viewBox="0 0 24 24">
-                      <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                      <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                    </svg>
-                    Generating {imageCount} Images...
-                  </span>
-                ) : (
-                  `✨ Generate ${imageCount} ${imageCount === 1 ? 'Image' : 'Images'}`
-                )}
+                <div className="text-3xl mb-2">{feature.icon}</div>
+                <div className="font-semibold text-gray-900 text-sm mb-1">{feature.name}</div>
+                <div className="text-xs text-gray-500">{feature.description}</div>
               </button>
-
-              {error && (
-                <div className="mt-4 p-3 bg-red-50 border border-red-200 rounded-lg text-sm text-red-700">
-                  <strong>Error:</strong> {error}
-                </div>
-              )}
-            </div>
+            ))}
           </div>
+        </div>
 
-          {/* Right Column - Results */}
-          <div>
-            <div className="bg-white rounded-lg shadow-md p-6 border border-gray-200">
-              <h2 className="text-xl font-bold text-gray-900 mb-4">3. Generated Images</h2>
-              <ResultsGallery
-                images={generatedImages}
-                isLoading={isGenerating}
-                imageCount={imageCount}
-              />
-            </div>
-          </div>
+        {/* Main Content - Feature Components */}
+        <div>
+          {renderFeatureContent()}
         </div>
 
         {/* Footer */}
         <div className="mt-12 text-center text-sm text-gray-500">
           <p>
-            Built with ❤️ for UMKM • Your API key is stored locally and never sent to any server
+            AI Foto Estetik BYOK • Dibuat untuk UMKM Indonesia
           </p>
           <p className="mt-1">
-            Powered by Google Gemini AI • No subscription required
+            API key disimpan lokal di browser Anda • Powered by Google Gemini AI
           </p>
         </div>
       </div>
