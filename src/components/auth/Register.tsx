@@ -1,13 +1,10 @@
 import React, { useState } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';
 
-interface RegisterProps {
-  onSwitchToLogin: () => void;
-  onRegistrationSuccess: () => void;
-}
-
-const Register: React.FC<RegisterProps> = ({ onSwitchToLogin, onRegistrationSuccess }) => {
+const Register: React.FC = () => {
   const { signUp } = useAuth();
+  const navigate = useNavigate();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
@@ -37,7 +34,9 @@ const Register: React.FC<RegisterProps> = ({ onSwitchToLogin, onRegistrationSucc
 
     try {
       await signUp(email, password);
-      onRegistrationSuccess();
+      // Navigate to a success message or verification page
+      alert('Pendaftaran berhasil! Silakan cek email Anda untuk verifikasi.');
+      navigate('/login');
     } catch (err: any) {
       console.error('Registration error:', err);
 
@@ -54,35 +53,52 @@ const Register: React.FC<RegisterProps> = ({ onSwitchToLogin, onRegistrationSucc
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
-      <div className="max-w-md w-full space-y-8">
-        <div>
-          <div className="flex justify-center">
-            <div className="w-16 h-16 bg-gradient-to-br from-indigo-600 to-purple-600 rounded-2xl flex items-center justify-center">
-              <svg className="w-10 h-10 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
-              </svg>
+    <div className="min-h-screen flex">
+      {/* Left Side - Form */}
+      <div className="flex-1 flex items-center justify-center px-4 sm:px-6 lg:px-20 xl:px-24 bg-white">
+        <div className="max-w-md w-full space-y-8 animate-fade-in">
+          {/* Logo & Title */}
+          <div className="text-left">
+            <div className="flex items-center gap-3 mb-6">
+              <div className="w-12 h-12 bg-gradient-to-br from-purple-600 to-blue-600 rounded-xl flex items-center justify-center shadow-lg">
+                <svg className="w-7 h-7 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                </svg>
+              </div>
+              <h1 className="text-2xl font-bold text-gray-900">AI Foto Estetik</h1>
             </div>
+            <h2 className="text-3xl font-bold text-gray-900 mb-2">
+              Buat Akun Baru
+            </h2>
+            <p className="text-gray-600">
+              Sudah punya akun?{' '}
+              <Link to="/login" className="text-purple-600 hover:text-purple-700 font-medium">
+                Masuk di sini
+              </Link>
+            </p>
           </div>
-          <h2 className="mt-6 text-center text-3xl font-extrabold text-gray-900">
-            Daftar Akun Baru
-          </h2>
-          <p className="mt-2 text-center text-sm text-gray-600">
-            Mulai gunakan AI Foto Estetik BYOK
-          </p>
-        </div>
 
-        <form className="mt-8 space-y-6" onSubmit={handleSubmit}>
+          {/* Error Message */}
           {error && (
-            <div className="bg-red-50 border border-red-200 rounded-lg p-4">
-              <p className="text-sm text-red-600">{error}</p>
+            <div className="bg-red-50 border-l-4 border-red-500 p-4 rounded-lg animate-shake">
+              <div className="flex">
+                <div className="flex-shrink-0">
+                  <svg className="h-5 w-5 text-red-400" viewBox="0 0 20 20" fill="currentColor">
+                    <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
+                  </svg>
+                </div>
+                <div className="ml-3">
+                  <p className="text-sm text-red-700">{error}</p>
+                </div>
+              </div>
             </div>
           )}
 
-          <div className="space-y-4">
+          {/* Register Form */}
+          <form onSubmit={handleSubmit} className="space-y-6">
             <div>
-              <label htmlFor="email" className="block text-sm font-medium text-gray-700">
-                Email
+              <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-2">
+                Alamat Email
               </label>
               <input
                 id="email"
@@ -92,13 +108,13 @@ const Register: React.FC<RegisterProps> = ({ onSwitchToLogin, onRegistrationSucc
                 required
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                className="mt-1 appearance-none relative block w-full px-3 py-2 border border-gray-300 rounded-lg placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm"
+                className="appearance-none relative block w-full px-4 py-3 border border-gray-300 placeholder-gray-400 text-gray-900 rounded-xl focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all"
                 placeholder="nama@email.com"
               />
             </div>
 
             <div>
-              <label htmlFor="password" className="block text-sm font-medium text-gray-700">
+              <label htmlFor="password" className="block text-sm font-medium text-gray-700 mb-2">
                 Password
               </label>
               <input
@@ -109,13 +125,13 @@ const Register: React.FC<RegisterProps> = ({ onSwitchToLogin, onRegistrationSucc
                 required
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                className="mt-1 appearance-none relative block w-full px-3 py-2 border border-gray-300 rounded-lg placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm"
+                className="appearance-none relative block w-full px-4 py-3 border border-gray-300 placeholder-gray-400 text-gray-900 rounded-xl focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all"
                 placeholder="Minimal 6 karakter"
               />
             </div>
 
             <div>
-              <label htmlFor="confirm-password" className="block text-sm font-medium text-gray-700">
+              <label htmlFor="confirm-password" className="block text-sm font-medium text-gray-700 mb-2">
                 Konfirmasi Password
               </label>
               <input
@@ -126,40 +142,179 @@ const Register: React.FC<RegisterProps> = ({ onSwitchToLogin, onRegistrationSucc
                 required
                 value={confirmPassword}
                 onChange={(e) => setConfirmPassword(e.target.value)}
-                className="mt-1 appearance-none relative block w-full px-3 py-2 border border-gray-300 rounded-lg placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm"
+                className="appearance-none relative block w-full px-4 py-3 border border-gray-300 placeholder-gray-400 text-gray-900 rounded-xl focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all"
                 placeholder="Ketik ulang password"
               />
             </div>
-          </div>
 
-          <div>
+            <div className="flex items-start">
+              <div className="flex items-center h-5">
+                <input
+                  id="terms"
+                  name="terms"
+                  type="checkbox"
+                  required
+                  className="h-4 w-4 text-purple-600 focus:ring-purple-500 border-gray-300 rounded"
+                />
+              </div>
+              <div className="ml-3 text-sm">
+                <label htmlFor="terms" className="text-gray-600">
+                  Saya setuju dengan{' '}
+                  <a href="#" className="text-purple-600 hover:text-purple-700 font-medium">
+                    syarat & ketentuan
+                  </a>{' '}
+                  yang berlaku
+                </label>
+              </div>
+            </div>
+
             <button
               type="submit"
               disabled={loading}
-              className="group relative w-full flex justify-center py-3 px-4 border border-transparent text-sm font-medium rounded-lg text-white bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 disabled:opacity-50 disabled:cursor-not-allowed"
+              className="group relative w-full flex justify-center items-center gap-2 py-3 px-4 border border-transparent text-base font-medium rounded-xl text-white bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500 disabled:opacity-50 disabled:cursor-not-allowed transition-all transform hover:scale-105 shadow-lg"
             >
-              {loading ? 'Sedang Mendaftar...' : '✨ Daftar Sekarang'}
+              {loading ? (
+                <>
+                  <svg className="animate-spin h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                  </svg>
+                  <span>Sedang mendaftar...</span>
+                </>
+              ) : (
+                <>
+                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z" />
+                  </svg>
+                  <span>Daftar Sekarang</span>
+                </>
+              )}
             </button>
+          </form>
+
+          {/* Info Box */}
+          <div className="bg-blue-50 border-l-4 border-blue-500 p-4 rounded-lg">
+            <div className="flex">
+              <div className="flex-shrink-0">
+                <svg className="h-5 w-5 text-blue-400" viewBox="0 0 20 20" fill="currentColor">
+                  <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clipRule="evenodd" />
+                </svg>
+              </div>
+              <div className="ml-3">
+                <p className="text-xs text-blue-700">
+                  Setelah mendaftar, Anda akan menerima email verifikasi.
+                  Silakan cek inbox Anda dan klik link verifikasi untuk mengaktifkan akun.
+                </p>
+              </div>
+            </div>
           </div>
 
-          <div className="text-center">
-            <button
-              type="button"
-              onClick={onSwitchToLogin}
-              className="text-sm text-indigo-600 hover:text-indigo-500"
-            >
-              Sudah punya akun? <span className="font-medium">Masuk di sini</span>
-            </button>
-          </div>
-        </form>
-
-        <div className="mt-8 bg-blue-50 border border-blue-200 rounded-lg p-4">
-          <p className="text-xs text-blue-800 text-center">
-            ℹ️ Setelah mendaftar, Anda akan menerima email verifikasi.
-            Silakan verifikasi email Anda untuk dapat menggunakan aplikasi.
+          {/* Login Link */}
+          <p className="text-center text-sm text-gray-600">
+            Sudah punya akun?{' '}
+            <Link to="/login" className="font-medium text-purple-600 hover:text-purple-700">
+              Masuk di sini
+            </Link>
           </p>
         </div>
       </div>
+
+      {/* Right Side - Illustration */}
+      <div className="hidden lg:flex flex-1 items-center justify-center bg-gradient-to-br from-indigo-100 via-purple-50 to-blue-100 rounded-l-3xl relative overflow-hidden">
+        <div className="absolute inset-0 opacity-10">
+          <div className="absolute top-20 left-20 w-72 h-72 bg-purple-400 rounded-full mix-blend-multiply filter blur-xl animate-blob"></div>
+          <div className="absolute top-40 right-20 w-72 h-72 bg-blue-400 rounded-full mix-blend-multiply filter blur-xl animate-blob animation-delay-2000"></div>
+          <div className="absolute bottom-20 left-40 w-72 h-72 bg-indigo-400 rounded-full mix-blend-multiply filter blur-xl animate-blob animation-delay-4000"></div>
+        </div>
+
+        <div className="relative z-10 text-center px-12">
+          <div className="mb-8 relative">
+            <div className="w-80 h-80 mx-auto bg-white/80 backdrop-blur-sm rounded-3xl shadow-2xl p-8 border border-white/20">
+              <div className="space-y-6">
+                <div className="text-center mb-4">
+                  <div className="inline-block p-4 bg-gradient-to-br from-purple-500 to-blue-500 rounded-2xl mb-4">
+                    <svg className="w-12 h-12 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4" />
+                    </svg>
+                  </div>
+                  <h4 className="font-bold text-gray-800 text-lg">6 Fitur AI Lengkap</h4>
+                </div>
+                <div className="grid grid-cols-2 gap-3">
+                  <div className="bg-gradient-to-br from-purple-100 to-pink-100 rounded-xl p-3 text-left">
+                    <div className="text-2xl mb-1">📸</div>
+                    <div className="text-xs font-medium text-gray-700">Photoshoot Produk</div>
+                  </div>
+                  <div className="bg-gradient-to-br from-blue-100 to-cyan-100 rounded-xl p-3 text-left">
+                    <div className="text-2xl mb-1">👤</div>
+                    <div className="text-xs font-medium text-gray-700">Foto Model AI</div>
+                  </div>
+                  <div className="bg-gradient-to-br from-indigo-100 to-purple-100 rounded-xl p-3 text-left">
+                    <div className="text-2xl mb-1">🖼️</div>
+                    <div className="text-xs font-medium text-gray-700">Gabung Gambar</div>
+                  </div>
+                  <div className="bg-gradient-to-br from-purple-100 to-blue-100 rounded-xl p-3 text-left">
+                    <div className="text-2xl mb-1">✏️</div>
+                    <div className="text-xs font-medium text-gray-700">Edit Foto</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <h3 className="text-3xl font-bold text-gray-800 mb-4">
+            Bergabung dengan 1,200+ UMKM
+          </h3>
+          <p className="text-lg text-gray-600 max-w-md mx-auto">
+            Yang sudah menghemat biaya fotografi hingga 80% dengan AI Foto Estetik
+          </p>
+
+          <div className="mt-8 inline-flex items-center gap-2 bg-white/80 backdrop-blur-sm px-6 py-3 rounded-full shadow-lg">
+            <svg className="w-5 h-5 text-green-500" fill="currentColor" viewBox="0 0 20 20">
+              <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+            </svg>
+            <span className="text-sm font-medium text-gray-700">Gratis 7 hari trial</span>
+          </div>
+        </div>
+      </div>
+
+      <style>{`
+        @keyframes fade-in {
+          from { opacity: 0; transform: translateY(20px); }
+          to { opacity: 1; transform: translateY(0); }
+        }
+
+        @keyframes shake {
+          0%, 100% { transform: translateX(0); }
+          25% { transform: translateX(-10px); }
+          75% { transform: translateX(10px); }
+        }
+
+        @keyframes blob {
+          0%, 100% { transform: translate(0, 0) scale(1); }
+          33% { transform: translate(30px, -50px) scale(1.1); }
+          66% { transform: translate(-20px, 20px) scale(0.9); }
+        }
+
+        .animate-fade-in {
+          animation: fade-in 0.6s ease-out;
+        }
+
+        .animate-shake {
+          animation: shake 0.4s ease-in-out;
+        }
+
+        .animate-blob {
+          animation: blob 7s infinite;
+        }
+
+        .animation-delay-2000 {
+          animation-delay: 2s;
+        }
+
+        .animation-delay-4000 {
+          animation-delay: 4s;
+        }
+      `}</style>
     </div>
   );
 };
