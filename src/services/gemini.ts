@@ -155,7 +155,8 @@ export async function generateImagesSimple(
 export async function generateFromText(
   config: GeminiConfig,
   prompt: string,
-  imageCount: number = 4
+  imageCount: number = 4,
+  aspectRatio: string = '1:1'
 ): Promise<string[]> {
   const { apiKey } = config;
 
@@ -175,7 +176,7 @@ export async function generateFromText(
           }],
           parameters: {
             sampleCount: 1,
-            aspectRatio: "1:1",
+            aspectRatio: aspectRatio,
           }
         })
       });
