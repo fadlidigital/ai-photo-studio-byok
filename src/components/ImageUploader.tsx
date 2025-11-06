@@ -9,8 +9,16 @@ export default function ImageUploader({ onImageUpload }: ImageUploaderProps) {
   const [preview, setPreview] = useState<string | null>(null);
 
   const handleFile = useCallback((file: File) => {
+    // Validate file type
     if (!file.type.startsWith('image/')) {
-      alert('Please upload an image file');
+      alert('❌ File harus berupa gambar (JPG, PNG, WEBP)');
+      return;
+    }
+
+    // Validate file size (max 10MB for mobile compatibility)
+    const MAX_FILE_SIZE = 10 * 1024 * 1024; // 10MB
+    if (file.size > MAX_FILE_SIZE) {
+      alert('❌ Ukuran file terlalu besar!\n\nMaksimal: 10 MB\nFile Anda: ' + (file.size / 1024 / 1024).toFixed(2) + ' MB\n\nSilakan kompres foto Anda terlebih dahulu.');
       return;
     }
 
@@ -78,8 +86,10 @@ export default function ImageUploader({ onImageUpload }: ImageUploaderProps) {
           <input
             type="file"
             accept="image/*"
+            capture="environment"
             onChange={handleChange}
             className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
+            title="Upload atau ambil foto"
           />
 
           <div className="flex flex-col items-center gap-3">
