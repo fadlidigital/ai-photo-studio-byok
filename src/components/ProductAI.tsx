@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { generateImagesSimple } from '../services/gemini';
+import { generateImagesSimple, generateFromText } from '../services/gemini';
 import { storage } from '../services/storage';
 import ImageUploader from './ImageUploader';
 import ResultsGallery from './ResultsGallery';
@@ -9,6 +9,7 @@ interface ProductAIProps {
 }
 
 type FeatureMode = 'create' | 'angle';
+type AspectRatio = '1:1' | '3:4' | '16:9' | '9:16';
 
 const productCategories = [
   { id: 'food', name: '🍽️ Makanan', prompt: 'delicious food photography, appetizing presentation, professional food styling, vibrant colors, top view or side angle' },
@@ -24,12 +25,26 @@ const productCategories = [
 ];
 
 const angleOptions = [
+  // Camera Angles
   { id: 'top-view', name: '📐 Top View (Atas)', prompt: 'top-down view, overhead shot, flat lay photography, organized layout, all elements visible' },
   { id: 'side-view', name: '↔️ Side View (Samping)', prompt: 'side angle view, profile shot, showing depth and dimension, professional angle, clear product shape' },
   { id: 'front-view', name: '⬆️ Front View (Depan)', prompt: 'straight front view, centered composition, symmetrical framing, eye-level perspective, clear product display' },
   { id: '45-degree', name: '📐 45° Angle', prompt: '45 degree angle view, three-quarter perspective, dynamic composition, professional product angle, depth visible' },
   { id: 'close-up', name: '🔍 Close-up Detail', prompt: 'macro close-up shot, detail focus, texture visible, intimate perspective, sharp details' },
   { id: 'lifestyle', name: '✨ Lifestyle Context', prompt: 'lifestyle setting, product in use, natural environment, contextual background, relatable scene' },
+  // Fashion/Model Poses (untuk produk fashion)
+  { id: 'standing', name: '🧍 Berdiri Tegap', prompt: 'standing pose, confident stance, full body shot, professional modeling pose' },
+  { id: 'sitting', name: '🪑 Duduk Santai', prompt: 'sitting pose, relaxed posture, comfortable position, natural modeling' },
+  { id: 'walking', name: '🚶 Berjalan', prompt: 'walking pose, dynamic movement, natural gait, action shot' },
+  { id: 'portrait', name: '👤 Portrait Close-up', prompt: 'portrait pose, face focus, upper body shot, engaging expression' },
+  { id: 'action', name: '⚡ Action Pose', prompt: 'dynamic action pose, movement captured, energetic, dramatic positioning' },
+];
+
+const aspectRatios: { value: AspectRatio; label: string; icon: string }[] = [
+  { value: '1:1', label: 'Square (1:1)', icon: '⬜' },
+  { value: '3:4', label: 'Portrait (3:4)', icon: '📱' },
+  { value: '16:9', label: 'Landscape (16:9)', icon: '🖥️' },
+  { value: '9:16', label: 'Story (9:16)', icon: '📲' },
 ];
 
 const ProductAI: React.FC<ProductAIProps> = ({ apiKey }) => {
@@ -37,6 +52,7 @@ const ProductAI: React.FC<ProductAIProps> = ({ apiKey }) => {
   const [uploadedImage, setUploadedImage] = useState<{ base64: string; mimeType: string; preview: string } | null>(null);
   const [selectedCategory, setSelectedCategory] = useState(productCategories[0].id);
   const [selectedAngle, setSelectedAngle] = useState(angleOptions[0].id);
+  const [aspectRatio, setAspectRatio] = useState<AspectRatio>('1:1');
   const [customPrompt, setCustomPrompt] = useState('');
   const [imageCount, setImageCount] = useState(2);
   const [generatedImages, setGeneratedImages] = useState<string[]>([]);
@@ -53,17 +69,32 @@ const ProductAI: React.FC<ProductAIProps> = ({ apiKey }) => {
     setError('');
 
     try {
-      let fullPrompt = '';
+      let images: string[] = [];
 
       if (mode === 'create') {
+        // Text-to-image generation (Buat Produk Baru)
         const category = productCategories.find(c => c.id === selectedCategory);
-        fullPrompt = `${category?.prompt}. ${customPrompt}. Create a professional product photography with high quality and realistic details. Commercial product shot.`;
+        const fullPrompt = `${category?.prompt}. ${customPrompt}. Create a professional product photography with high quality and realistic details. Commercial product shot.`;
+
+        images = await generateFromText(
+          { apiKey },
+          fullPrompt,
+          imageCount,
+          aspectRatio
+        );
       } else {
+        // Image-to-image transformation (Ubah Angle)
         const angle = angleOptions.find(a => a.id === selectedAngle);
-        fullPrompt = `Transform this product image to: ${angle?.prompt}. ${customPrompt}. Keep the product recognizable, maintain product details and colors, only change the camera angle and composition. Professional product photography.`;
+        const fullPrompt = `Transform this product image to: ${angle?.prompt}. ${customPrompt}. Keep the product recognizable, maintain product details and colors, only change the camera angle and composition. Professional product photography. Aspect ratio: ${aspectRatio}.`;
+
+        images = await generateImagesSimple(
+          uploadedImage!.preview,
+          fullPrompt,
+          imageCount,
+          apiKey
+        );
       }
 
-      const images = await generateImagesSimple(uploadedImage?.preview || 'data:image/png;base64,', fullPrompt, imageCount, apiKey);
       setGeneratedImages(images);
 
       // Update usage stats
@@ -156,6 +187,29 @@ const ProductAI: React.FC<ProductAIProps> = ({ apiKey }) => {
                 className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                 rows={3}
               />
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Aspect Ratio:
+              </label>
+              <div className="grid grid-cols-4 gap-2">
+                {aspectRatios.map((ratio) => (
+                  <button
+                    key={ratio.value}
+                    type="button"
+                    onClick={() => setAspectRatio(ratio.value)}
+                    className={`py-2 px-3 rounded-lg border-2 transition-all text-sm font-medium ${
+                      aspectRatio === ratio.value
+                        ? 'border-blue-500 bg-blue-50 text-blue-700'
+                        : 'border-gray-300 bg-white text-gray-700 hover:border-blue-300'
+                    }`}
+                  >
+                    <div className="text-lg mb-1">{ratio.icon}</div>
+                    <div className="text-xs">{ratio.value}</div>
+                  </button>
+                ))}
+              </div>
             </div>
 
             <div>
