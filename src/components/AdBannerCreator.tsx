@@ -8,6 +8,8 @@ interface AdBannerCreatorProps {
   apiKey: string;
 }
 
+type AspectRatio = '1:1' | '3:4' | '16:9' | '9:16';
+
 const bannerSizes = [
   { id: 'instagram_square', name: 'Instagram Post (1:1)', prompt: 'square format 1:1 ratio, instagram post style' },
   { id: 'instagram_story', name: 'Instagram Story (9:16)', prompt: 'vertical format 9:16 ratio, instagram story style' },
@@ -24,10 +26,18 @@ const adStyles = [
   { id: 'luxury', name: 'Luxury Premium', prompt: 'luxury premium design, elegant, sophisticated, gold accents, high-end feel' },
 ];
 
+const aspectRatios: { value: AspectRatio; label: string; icon: string }[] = [
+  { value: '1:1', label: 'Square (1:1)', icon: '⬜' },
+  { value: '3:4', label: 'Portrait (3:4)', icon: '📱' },
+  { value: '16:9', label: 'Landscape (16:9)', icon: '🖥️' },
+  { value: '9:16', label: 'Story (9:16)', icon: '📲' },
+];
+
 const AdBannerCreator: React.FC<AdBannerCreatorProps> = ({ apiKey }) => {
   const [uploadedImage, setUploadedImage] = useState<{ base64: string; mimeType: string; preview: string } | null>(null);
   const [bannerSize, setBannerSize] = useState(bannerSizes[0].id);
   const [adStyle, setAdStyle] = useState(adStyles[0].id);
+  const [aspectRatio, setAspectRatio] = useState<AspectRatio>('1:1');
   const [productName, setProductName] = useState('');
   const [headline, setHeadline] = useState('');
   const [additionalText, setAdditionalText] = useState('');
@@ -64,7 +74,7 @@ const AdBannerCreator: React.FC<AdBannerCreatorProps> = ({ apiKey }) => {
         fullPrompt += `Include the uploaded product/image as the main visual element. `;
       }
 
-      fullPrompt += `Professional advertising design, clear typography, balanced composition, marketing-ready banner.`;
+      fullPrompt += `Professional advertising design, clear typography, balanced composition, marketing-ready banner. Aspect ratio: ${aspectRatio}.`;
 
       const baseImage = uploadedImage?.preview || 'data:image/png;base64,';
       const images = await generateImagesSimple(baseImage, fullPrompt, imageCount, apiKey);
@@ -163,6 +173,29 @@ const AdBannerCreator: React.FC<AdBannerCreatorProps> = ({ apiKey }) => {
                 className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                 rows={2}
               />
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Aspect Ratio:
+              </label>
+              <div className="grid grid-cols-4 gap-2">
+                {aspectRatios.map((ratio) => (
+                  <button
+                    key={ratio.value}
+                    type="button"
+                    onClick={() => setAspectRatio(ratio.value)}
+                    className={`py-2 px-3 rounded-lg border-2 transition-all text-sm font-medium ${
+                      aspectRatio === ratio.value
+                        ? 'border-blue-500 bg-blue-50 text-blue-700'
+                        : 'border-gray-300 bg-white text-gray-700 hover:border-blue-300'
+                    }`}
+                  >
+                    <div className="text-lg mb-1">{ratio.icon}</div>
+                    <div className="text-xs">{ratio.value}</div>
+                  </button>
+                ))}
+              </div>
             </div>
 
             <div>
