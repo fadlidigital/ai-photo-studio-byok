@@ -3,7 +3,7 @@ import ApiKeyManager from './components/ApiKeyManager';
 import UsageStats from './components/UsageStats';
 import UserProfile from './components/UserProfile';
 import ProductPhotoshoot from './components/ProductPhotoshoot';
-import AIModelPhoto from './components/AIModelPhoto';
+import ProductAI from './components/ProductAI';
 import CombineImages from './components/CombineImages';
 import EditPhoto from './components/EditPhoto';
 import PromptGenerator from './components/PromptGenerator';
@@ -21,7 +21,7 @@ interface FeatureTab {
 
 const features: FeatureTab[] = [
   { id: 'photoshoot', name: 'Photoshoot Produk', icon: '📸', description: 'Background profesional untuk foto produk' },
-  { id: 'model', name: 'Foto Model AI', icon: '👤', description: 'Buat model baru atau ubah pose' },
+  { id: 'model', name: 'Foto Produk AI', icon: '🛍️', description: 'Buat produk baru atau ubah angle' },
   { id: 'combine', name: 'Gabungkan Gambar', icon: '🖼️', description: 'Kombinasi 2 gambar jadi 1' },
   { id: 'edit', name: 'Edit Foto', icon: '✏️', description: 'Perbaiki dan enhance foto' },
   { id: 'prompt', name: 'Buat Prompt', icon: '💡', description: 'Generate prompt dari foto' },
@@ -60,7 +60,7 @@ function App() {
       case 'photoshoot':
         return <ProductPhotoshoot apiKey={apiKey} />;
       case 'model':
-        return <AIModelPhoto apiKey={apiKey} />;
+        return <ProductAI apiKey={apiKey} />;
       case 'combine':
         return <CombineImages apiKey={apiKey} />;
       case 'edit':
@@ -88,7 +88,7 @@ function App() {
               </div>
               <div className="text-left">
                 <h1 className="text-3xl font-bold bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent">
-                  AI Foto Estetik BYOK
+                  AI Foto Estetik
                 </h1>
                 <p className="text-sm text-gray-600 hidden md:block">
                   Studio Foto AI Lengkap untuk UMKM
@@ -138,7 +138,7 @@ function App() {
         {/* Footer */}
         <div className="mt-12 text-center text-sm text-gray-500">
           <p>
-            AI Foto Estetik BYOK • Dibuat untuk UMKM Indonesia
+            AI Foto Estetik • Dibuat untuk UMKM Indonesia
           </p>
           <p className="mt-1">
             API key disimpan lokal di browser Anda • Powered by Google Gemini AI
