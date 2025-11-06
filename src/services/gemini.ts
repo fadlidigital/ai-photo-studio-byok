@@ -118,6 +118,37 @@ export async function generateImages(
 }
 
 /**
+ * Simplified wrapper for generating images (used by feature components)
+ * Accepts base64 data URL directly
+ */
+export async function generateImagesSimple(
+  imageDataUrl: string,
+  prompt: string,
+  imageCount: number,
+  apiKey: string
+): Promise<string[]> {
+  // Extract base64 and mime type from data URL
+  let imageBase64 = '';
+  let mimeType = 'image/jpeg';
+
+  if (imageDataUrl && imageDataUrl.startsWith('data:')) {
+    const parts = imageDataUrl.split(',');
+    if (parts.length === 2) {
+      imageBase64 = parts[1];
+      const mimeMatch = parts[0].match(/data:(.*?);/);
+      if (mimeMatch) {
+        mimeType = mimeMatch[1];
+      }
+    }
+  }
+
+  return generateImages(
+    { apiKey },
+    { imageBase64, mimeType, prompt, imageCount }
+  );
+}
+
+/**
  * Generate images from text only (no input image)
  * Note: This uses Imagen model which may not be available yet
  */
