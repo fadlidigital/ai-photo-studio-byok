@@ -9,6 +9,7 @@ interface EditPhotoProps {
 }
 
 type EditMode = 'enhance' | 'fix';
+type AspectRatio = '1:1' | '3:4' | '16:9' | '9:16';
 
 const enhanceOptions = [
   { id: 'quality', name: 'Tingkatkan Kualitas', prompt: 'enhance image quality, increase sharpness and clarity, improve details, professional photography quality' },
@@ -26,10 +27,18 @@ const fixOptions = [
   { id: 'old', name: 'Restore Foto Lama', prompt: 'restore old photo, remove scratches and damage, colorize if black and white, vintage photo restoration' },
 ];
 
+const aspectRatios: { value: AspectRatio; label: string; icon: string }[] = [
+  { value: '1:1', label: 'Square (1:1)', icon: '⬜' },
+  { value: '3:4', label: 'Portrait (3:4)', icon: '📱' },
+  { value: '16:9', label: 'Landscape (16:9)', icon: '🖥️' },
+  { value: '9:16', label: 'Story (9:16)', icon: '📲' },
+];
+
 const EditPhoto: React.FC<EditPhotoProps> = ({ apiKey }) => {
   const [mode, setMode] = useState<EditMode>('enhance');
   const [uploadedImage, setUploadedImage] = useState<{ base64: string; mimeType: string; preview: string } | null>(null);
   const [selectedOption, setSelectedOption] = useState(enhanceOptions[0].id);
+  const [aspectRatio, setAspectRatio] = useState<AspectRatio>('1:1');
   const [additionalPrompt, setAdditionalPrompt] = useState('');
   const [imageCount, setImageCount] = useState(2);
   const [generatedImages, setGeneratedImages] = useState<string[]>([]);
@@ -49,7 +58,7 @@ const EditPhoto: React.FC<EditPhotoProps> = ({ apiKey }) => {
 
     try {
       const option = currentOptions.find(o => o.id === selectedOption);
-      const fullPrompt = `${option?.prompt}. ${additionalPrompt}. Keep the main subject and composition, only improve the technical quality and aesthetics.`;
+      const fullPrompt = `${option?.prompt}. ${additionalPrompt}. Keep the main subject and composition, only improve the technical quality and aesthetics. Aspect ratio: ${aspectRatio}.`;
 
       const images = await generateImagesSimple(uploadedImage.preview, fullPrompt, imageCount, apiKey);
       setGeneratedImages(images);
@@ -127,6 +136,29 @@ const EditPhoto: React.FC<EditPhotoProps> = ({ apiKey }) => {
                 className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                 rows={3}
               />
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Aspect Ratio:
+              </label>
+              <div className="grid grid-cols-4 gap-2">
+                {aspectRatios.map((ratio) => (
+                  <button
+                    key={ratio.value}
+                    type="button"
+                    onClick={() => setAspectRatio(ratio.value)}
+                    className={`py-2 px-3 rounded-lg border-2 transition-all text-sm font-medium ${
+                      aspectRatio === ratio.value
+                        ? 'border-blue-500 bg-blue-50 text-blue-700'
+                        : 'border-gray-300 bg-white text-gray-700 hover:border-blue-300'
+                    }`}
+                  >
+                    <div className="text-lg mb-1">{ratio.icon}</div>
+                    <div className="text-xs">{ratio.value}</div>
+                  </button>
+                ))}
+              </div>
             </div>
 
             <div>
