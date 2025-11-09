@@ -43,13 +43,6 @@ const angleOptions = [
 const aspectRatios: { value: AspectRatio; label: string; icon: string }[] = [
   { value: '1:1', label: 'Square (1:1)', icon: '⬜' },
   { value: '3:4', label: 'Portrait (3:4)', icon: '📱' },
-  { value: '16:9', label: 'Landscape (16:9)', icon: '🖥️' },
-  { value: '9:16', label: 'Story (9:16)', icon: '📲' },
-];
-
-const aspectRatios: { value: AspectRatio; label: string; icon: string }[] = [
-  { value: '1:1', label: 'Square (1:1)', icon: '⬜' },
-  { value: '3:4', label: 'Portrait (3:4)', icon: '📱' },
   { value: '9:16', label: 'Vertical (9:16)', icon: '📲' },
 ];
 
@@ -76,15 +69,20 @@ const ProductAI: React.FC<ProductAIProps> = ({ apiKey }) => {
 
     try {
       let images: string[] = [];
+      let fullPrompt = '';
 
       if (mode === 'create') {
         // Text-to-image generation (Buat Produk Baru)
         const category = productCategories.find(c => c.id === selectedCategory);
-        fullPrompt = `${category?.prompt}. ${customPrompt}. Create a professional product photography with high quality and realistic details. Commercial product shot. Aspect ratio: ${aspectRatio}.`;
+        fullPrompt = `${category?.prompt}. ${customPrompt}. Create a professional product photography with high quality and realistic details. Commercial product shot.`;
+
+        images = await generateFromText({ apiKey }, fullPrompt, imageCount, aspectRatio);
       } else {
         // Image-to-image transformation (Ubah Angle)
         const angle = angleOptions.find(a => a.id === selectedAngle);
         fullPrompt = `Transform this product image to: ${angle?.prompt}. ${customPrompt}. Keep the product recognizable, maintain product details and colors, only change the camera angle and composition. Professional product photography. Aspect ratio: ${aspectRatio}.`;
+
+        images = await generateImagesSimple(uploadedImage?.preview || 'data:image/png;base64,', fullPrompt, imageCount, apiKey);
       }
 
       setGeneratedImages(images);
