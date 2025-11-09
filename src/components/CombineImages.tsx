@@ -7,13 +7,12 @@ interface CombineImagesProps {
   apiKey: string;
 }
 
-type AspectRatio = '1:1' | '3:4' | '16:9' | '9:16';
+type AspectRatio = '1:1' | '3:4' | '9:16';
 
 const aspectRatios: { value: AspectRatio; label: string; icon: string }[] = [
   { value: '1:1', label: 'Square (1:1)', icon: '⬜' },
   { value: '3:4', label: 'Portrait (3:4)', icon: '📱' },
-  { value: '16:9', label: 'Landscape (16:9)', icon: '🖥️' },
-  { value: '9:16', label: 'Story (9:16)', icon: '📲' },
+  { value: '9:16', label: 'Vertical (9:16)', icon: '📲' },
 ];
 
 const CombineImages: React.FC<CombineImagesProps> = ({ apiKey }) => {
@@ -128,7 +127,7 @@ const CombineImages: React.FC<CombineImagesProps> = ({ apiKey }) => {
               <label className="block text-sm font-medium text-gray-700 mb-2">
                 Aspect Ratio:
               </label>
-              <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
+              <div className="grid grid-cols-3 gap-2">
                 {aspectRatios.map((ratio) => (
                   <button
                     key={ratio.value}

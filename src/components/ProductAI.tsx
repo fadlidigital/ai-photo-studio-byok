@@ -9,7 +9,7 @@ interface ProductAIProps {
 }
 
 type FeatureMode = 'create' | 'angle';
-type AspectRatio = '1:1' | '3:4' | '16:9' | '9:16';
+type AspectRatio = '1:1' | '3:4' | '9:16';
 
 const productCategories = [
   { id: 'food', name: '🍽️ Makanan', prompt: 'delicious food photography, appetizing presentation, professional food styling, vibrant colors, top view or side angle' },
@@ -47,6 +47,12 @@ const aspectRatios: { value: AspectRatio; label: string; icon: string }[] = [
   { value: '9:16', label: 'Story (9:16)', icon: '📲' },
 ];
 
+const aspectRatios: { value: AspectRatio; label: string; icon: string }[] = [
+  { value: '1:1', label: 'Square (1:1)', icon: '⬜' },
+  { value: '3:4', label: 'Portrait (3:4)', icon: '📱' },
+  { value: '9:16', label: 'Vertical (9:16)', icon: '📲' },
+];
+
 const ProductAI: React.FC<ProductAIProps> = ({ apiKey }) => {
   const [mode, setMode] = useState<FeatureMode>('create');
   const [uploadedImage, setUploadedImage] = useState<{ base64: string; mimeType: string; preview: string } | null>(null);
@@ -74,25 +80,11 @@ const ProductAI: React.FC<ProductAIProps> = ({ apiKey }) => {
       if (mode === 'create') {
         // Text-to-image generation (Buat Produk Baru)
         const category = productCategories.find(c => c.id === selectedCategory);
-        const fullPrompt = `${category?.prompt}. ${customPrompt}. Create a professional product photography with high quality and realistic details. Commercial product shot.`;
-
-        images = await generateFromText(
-          { apiKey },
-          fullPrompt,
-          imageCount,
-          aspectRatio
-        );
+        fullPrompt = `${category?.prompt}. ${customPrompt}. Create a professional product photography with high quality and realistic details. Commercial product shot. Aspect ratio: ${aspectRatio}.`;
       } else {
         // Image-to-image transformation (Ubah Angle)
         const angle = angleOptions.find(a => a.id === selectedAngle);
-        const fullPrompt = `Transform this product image to: ${angle?.prompt}. ${customPrompt}. Keep the product recognizable, maintain product details and colors, only change the camera angle and composition. Professional product photography. Aspect ratio: ${aspectRatio}.`;
-
-        images = await generateImagesSimple(
-          uploadedImage!.preview,
-          fullPrompt,
-          imageCount,
-          apiKey
-        );
+        fullPrompt = `Transform this product image to: ${angle?.prompt}. ${customPrompt}. Keep the product recognizable, maintain product details and colors, only change the camera angle and composition. Professional product photography. Aspect ratio: ${aspectRatio}.`;
       }
 
       setGeneratedImages(images);
@@ -193,7 +185,7 @@ const ProductAI: React.FC<ProductAIProps> = ({ apiKey }) => {
               <label className="block text-sm font-medium text-gray-700 mb-2">
                 Aspect Ratio:
               </label>
-              <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
+              <div className="grid grid-cols-3 gap-2">
                 {aspectRatios.map((ratio) => (
                   <button
                     key={ratio.value}
