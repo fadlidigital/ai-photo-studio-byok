@@ -86,7 +86,6 @@ export default function ImageUploader({ onImageUpload }: ImageUploaderProps) {
           <input
             type="file"
             accept="image/*"
-            capture="environment"
             onChange={handleChange}
             className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
             title="Upload atau ambil foto"
