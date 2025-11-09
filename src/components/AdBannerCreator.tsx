@@ -32,13 +32,6 @@ const adStyles = [
   { id: 'luxury', name: 'Luxury Premium', prompt: 'luxury premium design, elegant, sophisticated, gold accents, high-end feel' },
 ];
 
-const aspectRatios: { value: AspectRatio; label: string; icon: string }[] = [
-  { value: '1:1', label: 'Square (1:1)', icon: '⬜' },
-  { value: '3:4', label: 'Portrait (3:4)', icon: '📱' },
-  { value: '16:9', label: 'Landscape (16:9)', icon: '🖥️' },
-  { value: '9:16', label: 'Story (9:16)', icon: '📲' },
-];
-
 const AdBannerCreator: React.FC<AdBannerCreatorProps> = ({ apiKey }) => {
   const [uploadedImage, setUploadedImage] = useState<{ base64: string; mimeType: string; preview: string } | null>(null);
   const [bannerSize, setBannerSize] = useState(bannerSizes[0].id);
