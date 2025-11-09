@@ -9,6 +9,7 @@ interface ProductAIProps {
 }
 
 type FeatureMode = 'create' | 'angle';
+type AspectRatio = '1:1' | '3:4' | '9:16';
 
 const productCategories = [
   { id: 'food', name: '🍽️ Makanan', prompt: 'delicious food photography, appetizing presentation, professional food styling, vibrant colors, top view or side angle' },
@@ -32,11 +33,18 @@ const angleOptions = [
   { id: 'lifestyle', name: '✨ Lifestyle Context', prompt: 'lifestyle setting, product in use, natural environment, contextual background, relatable scene' },
 ];
 
+const aspectRatios: { value: AspectRatio; label: string; icon: string }[] = [
+  { value: '1:1', label: 'Square (1:1)', icon: '⬜' },
+  { value: '3:4', label: 'Portrait (3:4)', icon: '📱' },
+  { value: '9:16', label: 'Vertical (9:16)', icon: '📲' },
+];
+
 const ProductAI: React.FC<ProductAIProps> = ({ apiKey }) => {
   const [mode, setMode] = useState<FeatureMode>('create');
   const [uploadedImage, setUploadedImage] = useState<{ base64: string; mimeType: string; preview: string } | null>(null);
   const [selectedCategory, setSelectedCategory] = useState(productCategories[0].id);
   const [selectedAngle, setSelectedAngle] = useState(angleOptions[0].id);
+  const [aspectRatio, setAspectRatio] = useState<AspectRatio>('1:1');
   const [customPrompt, setCustomPrompt] = useState('');
   const [imageCount, setImageCount] = useState(2);
   const [generatedImages, setGeneratedImages] = useState<string[]>([]);
@@ -57,10 +65,10 @@ const ProductAI: React.FC<ProductAIProps> = ({ apiKey }) => {
 
       if (mode === 'create') {
         const category = productCategories.find(c => c.id === selectedCategory);
-        fullPrompt = `${category?.prompt}. ${customPrompt}. Create a professional product photography with high quality and realistic details. Commercial product shot.`;
+        fullPrompt = `${category?.prompt}. ${customPrompt}. Create a professional product photography with high quality and realistic details. Commercial product shot. Aspect ratio: ${aspectRatio}.`;
       } else {
         const angle = angleOptions.find(a => a.id === selectedAngle);
-        fullPrompt = `Transform this product image to: ${angle?.prompt}. ${customPrompt}. Keep the product recognizable, maintain product details and colors, only change the camera angle and composition. Professional product photography.`;
+        fullPrompt = `Transform this product image to: ${angle?.prompt}. ${customPrompt}. Keep the product recognizable, maintain product details and colors, only change the camera angle and composition. Professional product photography. Aspect ratio: ${aspectRatio}.`;
       }
 
       const images = await generateImagesSimple(uploadedImage?.preview || 'data:image/png;base64,', fullPrompt, imageCount, apiKey);
@@ -156,6 +164,29 @@ const ProductAI: React.FC<ProductAIProps> = ({ apiKey }) => {
                 className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                 rows={3}
               />
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Aspect Ratio:
+              </label>
+              <div className="grid grid-cols-3 gap-2">
+                {aspectRatios.map((ratio) => (
+                  <button
+                    key={ratio.value}
+                    type="button"
+                    onClick={() => setAspectRatio(ratio.value)}
+                    className={`py-2 px-3 rounded-lg border-2 transition-all text-sm font-medium ${
+                      aspectRatio === ratio.value
+                        ? 'border-blue-500 bg-blue-50 text-blue-700'
+                        : 'border-gray-300 bg-white text-gray-700 hover:border-blue-300'
+                    }`}
+                  >
+                    <div className="text-lg mb-1">{ratio.icon}</div>
+                    <div className="text-xs">{ratio.value}</div>
+                  </button>
+                ))}
+              </div>
             </div>
 
             <div>

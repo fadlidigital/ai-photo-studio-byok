@@ -7,9 +7,18 @@ interface CombineImagesProps {
   apiKey: string;
 }
 
+type AspectRatio = '1:1' | '3:4' | '9:16';
+
+const aspectRatios: { value: AspectRatio; label: string; icon: string }[] = [
+  { value: '1:1', label: 'Square (1:1)', icon: '⬜' },
+  { value: '3:4', label: 'Portrait (3:4)', icon: '📱' },
+  { value: '9:16', label: 'Vertical (9:16)', icon: '📲' },
+];
+
 const CombineImages: React.FC<CombineImagesProps> = ({ apiKey }) => {
   const [image1, setImage1] = useState<string>('');
   const [image2, setImage2] = useState<string>('');
+  const [aspectRatio, setAspectRatio] = useState<AspectRatio>('1:1');
   const [combinePrompt, setCombinePrompt] = useState('');
   const [imageCount, setImageCount] = useState(2);
   const [generatedImages, setGeneratedImages] = useState<string[]>([]);
@@ -35,7 +44,7 @@ const CombineImages: React.FC<CombineImagesProps> = ({ apiKey }) => {
     setError('');
 
     try {
-      const fullPrompt = `Combine and blend these two images creatively: ${combinePrompt}. Create a seamless, professional composite image that merges elements from both images naturally.`;
+      const fullPrompt = `Combine and blend these two images creatively: ${combinePrompt}. Create a seamless, professional composite image that merges elements from both images naturally. Aspect ratio: ${aspectRatio}.`;
 
       // For now, we'll use image1 as base and describe image2 in the prompt
       // Note: Gemini API might have limitations with multiple images
@@ -112,6 +121,29 @@ const CombineImages: React.FC<CombineImagesProps> = ({ apiKey }) => {
                 className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                 rows={3}
               />
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Aspect Ratio:
+              </label>
+              <div className="grid grid-cols-3 gap-2">
+                {aspectRatios.map((ratio) => (
+                  <button
+                    key={ratio.value}
+                    type="button"
+                    onClick={() => setAspectRatio(ratio.value)}
+                    className={`py-2 px-3 rounded-lg border-2 transition-all text-sm font-medium ${
+                      aspectRatio === ratio.value
+                        ? 'border-blue-500 bg-blue-50 text-blue-700'
+                        : 'border-gray-300 bg-white text-gray-700 hover:border-blue-300'
+                    }`}
+                  >
+                    <div className="text-lg mb-1">{ratio.icon}</div>
+                    <div className="text-xs">{ratio.value}</div>
+                  </button>
+                ))}
+              </div>
             </div>
 
             <div>
